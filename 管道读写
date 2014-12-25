@@ -1,0 +1,42 @@
+匿名管道的读写
+#include<stdio.h> 
+#include<stdlib.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<sys/wait.h>
+#define BUFSIZE 256
+int main()
+{
+	pid_t pid;
+	int fd[2];
+	int status;
+	char buf[BUFSIZE]="Hello World!\d";
+	if(pipe(fd)<0)
+	{
+		printf("pipe error.\n");
+		exit(1);
+	}
+	pid=fork();
+	if(pid<0)
+	{
+		printf("fork error.\n");
+		exit(1);
+	}
+	if(pid==0)
+	{
+		close(fd[0]);
+		write(fd[1],buf,sizeof(buf));
+	}
+	else
+	{
+		close(fd[0]);
+		write(fd[1],buf,sizeof(buf));
+		printf("Received message form child process:\n%s",buf);
+		if(pid!=wait(&status))
+		{
+		printf("wait error.\n");
+		ezit(1);
+		}
+	}
+	return(0);
+}
