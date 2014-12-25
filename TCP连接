@@ -1,0 +1,53 @@
+编写一个数据流套接字的程序，实现客户-服务器之间的数据传输：
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<errno.h>
+#include<string.h>
+#include<sys/types.h>
+#include<netinet/in.h>
+#include<sys/socket.h>
+#define BUF_SIZE 128	/缓冲区的长度/
+#define SERV_PORT 2369    /服务器监听端口号/
+int main(int argc,char **argc)
+{	
+	int ret;
+	int sockfd; 	/定义sockfd长度/
+	struct sockaddr_in serv_addr;	/服务器IP地址和端口号信息/
+	char buf[BUF_SIZE];	/定义缓冲区/
+	int cnt;	
+	if(argc!=2)	/检查命令行参数个数是否正确/
+	{
+		printf("argument error.\n");
+		exit(1);
+	}
+	/创建套接字/
+	sockfd=socket(AF_INET,SOCK_STREAM,0);
+	if(sockfd==-1)
+	{
+		printf("socket error.\n");
+		exit(1);
+	}
+	/向服务器发送连接请求/
+	serv_addr.sin_family=AF_INET;	/TCP/IP地址/
+	serv_addr.sin_port=htons(SERV_PORT);	/服务器端口号，并转换为网络字节的格式/
+	serv_addr.sin_addr.s_addr=INADDR_ANY;	/这里我们使用环回地址，即127.0.0.1/
+	bzero(&(serv_addr.sin_zero),8);		/清零/
+	ret=connect(sockfd,(struck sockaddr*)&serv_add,sizeof(struct sockaddr));	/建立连接/
+	if(ret==-1)
+	{
+		printf("connet error\n");
+		exit(1);
+	}
+	/发送数据/
+	strcpy(buf,argv[1]);
+	cnt=send(sockfd,buf,BUF_SIZE,0);
+	if(cnt==-1)
+	{
+		peeror("send error\n");
+		exit(1);
+	}
+	printf("Send:%s\n",buf);	/输出所发送的字符串/
+	close(sockfd);
+	return(0);
+}
