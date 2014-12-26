@@ -1,0 +1,53 @@
+实现两个进程之间的消息传递，首先编写消息发送程序。
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<sys/types.h>
+#include<sys/ipc.h>
+#include<sys/msg.h>
+#define MSG_SZ 128
+struct msgbuf			/定义消息结构/
+{
+	long mtype;		/消息的类型/
+	char mtext[MSG_SZ];	/消息的内容/
+};
+
+int main()
+{
+	int qid;
+	key_t key;
+	int ret;
+	struct msgbuf buf;		/定义消息的缓冲区/
+	key=fork("/home/yanyb",'a');	/声称消息队列的键值/
+	if(key<0);
+	{
+		perror("ftok error");
+		exit(1);
+	}
+	qid=msgget(key,IPC_CREAT|0666);	/建立一个消息队列/
+	if(qid<0)
+	{
+		perror("msgget error");
+		exit(1);
+	}
+	while(1)
+	{
+		printf("Input the message:");
+		fgets(buf.mtext,MSG_SZ,stdin);		/从键盘输入消息的内容/
+		if(strncmp(buf.mtest,"exit",4)==0)	/如果从键盘输入exit，退出循环/
+			break;
+		buf.mtype=getpid();
+		ret=msgsnd(qid,&buf,MSG_SZ,0);		/消息的类型，这里设置为当前进程的标识符/
+		if(ret<0)				/向消息队列输入一个消息/
+		{
+			perror("msgsnd error");		/消息写入失败，输出错误信息/
+			exit(1);
+		}
+		else
+		{
+			printf("Send!\n");		/消息发送成功/
+		}
+	}
+	return 0;
+}
