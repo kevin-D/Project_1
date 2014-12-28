@@ -1,0 +1,37 @@
+能求出两个给定字符串的最大公共子串：
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define BUFFER_SIZE 256
+char *commonstring(char shortstring[],char longstring[])
+{
+	int i,j;
+	char *substring=malloc(BUFFER_SIZE);
+	if(strstr(longstring,shortstring)!=NULL)	/shortstring 即为最大公共子串/
+		return shortstring;
+	for(i=strlen(shortstring)-1;i--)
+	{
+		for(j=0;j<=strlen(shortstring)-i;j++)
+		{
+			memcpy(substring,&shorting[j],i);
+			substring[i]='\0';
+			if(strstr(longstring,substring)!=NULL)
+				return substring;
+		}
+	}
+	return NULL;
+}
+int main()
+{
+	char *str1=malloc(BUFFER_SIZE);
+	char *str2=malloc(BUFFER_SIZE);
+	char *common=NULL;
+	fgets(str1,BUFFER_SIZE,stdin);		/读取字符串A/
+	fgets(str2,BUFFER_SIZE,stdin);		/读取字符串B/
+	if(strlen(str1)>strlen(str2))	/调用commonstring函数时将短的字符串放前面/
+		common=commonstring(str2,str1);
+	else
+		common=commonstring(str1,str2);
+	printf("the longest common string is:%s\n",common);	/输出最大公共子串/
+	return 0;
+}
