@@ -1,0 +1,41 @@
+在不同的进程之间实现信号发送和接收，同时在传送过程附加其他信号：
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<signal.h>
+
+void sig_handler(int sig,siginfo_t*info,void *t)
+/信号处理函数/
+{
+	printf("Receive signal:%d\n",sig);
+/输出接收到的信号的值/
+	printf("Receive message:%d\n",info->si_int);
+/输出接收到的附加信息，这里为发送进程的标识符/
+	return;
+}
+
+int main()
+{
+	int status;
+	pid_t pid;
+	struct sigaction act;
+/定义sigaction结构/
+	pid=getpid();
+/获取当前进程标识符/
+	act.sa_sigaction=sig_handler;
+/使用sa_sigaction来设定处理函数/
+	sigemptyset(&act.sa_mask);
+/清空所有信号/
+	act.sa_flags=SA_SIGINFO;
+/设置SA_SIGINFO标志位/
+	status=sigaction(SIGUSR1,&act,NULL);
+	if(status<0)
+	{
+		printf("sigaction error.\n");
+	}
+	printf("Receiver:\n");
+	printf("PID:%d\n",pid);
+/输出当前进程的标识符/
+	for(;;);
+	return 0;
+}
