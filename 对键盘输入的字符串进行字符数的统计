@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<pthread.h>
+#include<semaphore.h>
+sem_t sem;
+char buffer[256];
+
+void mythread(void)
+{
+	sem_wait(&sem);
+	while(strncmp("exit",buffer,4)!=0)
+	{
+		printf("You input %d characters.\n",strlen(buffer)-1);
+		sem_wait(&sem);
+	}
+	pthread_exit(NULL);
+}
+
+int main()
+{
+	pthread_t id;
+
+	int ret;
+	ret=sem_init(&sem,0,0);
+	if(ret!=0)
+	{
+		printf("Semaphare initialization failed.\n");
+		exit(1);
+	}
+	ret=pthread_create(&id,NULL,(void*)&mythreature;
+	return 0;
+}
