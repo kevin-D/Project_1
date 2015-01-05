@@ -1,0 +1,183 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <sys/types.h>
+
+#include <sys/stat.h>
+
+#include <fcntl.h>
+
+#include <string.h>
+
+
+int read_line(int fd,char *buf,int count)
+
+{
+    
+	char ch;
+    
+	int i;
+
+    
+	for(i = 0;i < count;i++)
+    
+	{
+        
+		if(read(fd,&ch,1) < 0)
+	
+		{
+	    
+			perror("file read error!\n");
+	    
+			exit(0);
+	
+		}
+	
+		if(ch == '\n')
+	
+		{ 
+	    
+			buf[i] = '\0';
+	    
+			return i+1;
+	
+		}
+	
+		else
+	
+		{
+	    
+			buf[i] = ch;
+	
+		}
+    
+	}    
+	
+	if(i >= count)
+	
+	{
+	    
+		buf[count - 1] = '\0';
+	    
+		return count;
+	
+	}
+    
+
+}
+
+
+
+int main(int argc,char *argv[])
+
+{
+    
+	int fd;
+    
+	char *w_buf = (char *)malloc(sizeof(char)*10);
+    
+	char *r_buf = (char *)malloc(sizeof(char)*10);
+    
+	int r_cout[3];
+    
+	int w_cout[3];
+    
+	int i=0;
+    
+	char *enter = "\n";
+    
+	int temp = 0;
+
+    
+	if((fd = open(argv[1],O_CREAT | O_RDWR,0755)) < 0)
+    
+	{
+        
+		perror("file open fail!\n");
+	
+		exit (0);
+    
+	}
+    
+	else
+    
+	{    
+       
+		for(i = 0;i < 3;i++)
+	
+		{
+	    
+			scanf("%s",w_buf);
+
+            
+			if ((w_cout[i] = write(fd,w_buf,strlen(w_buf))) < 0)
+	    
+			{
+	        
+				perror("file writ error!\n");
+	       
+				exit(0);
+	    
+			}
+	    
+			else
+	    
+			{  
+	        
+		
+				temp = write(fd,enter,1);
+		
+	    
+			}
+	 
+		}
+
+	 
+		lseek(fd,0,SEEK_SET);
+	 
+	 
+		for(i = 0;i < 3; i++)
+	 
+		{
+            
+			r_cout[i] = read_line(fd,r_buf,100);
+            
+			// printf("r_cout[%d]= %d",i,r_cout[i]);
+             
+			lseek(fd,-r_cout[i],SEEK_CUR);
+
+	     
+			if(read(fd,r_buf,r_cout[i]) < 0)
+	     
+			{
+	         
+				perror("file read error!\n");
+		 
+				exit (0);
+	     
+			}
+	    
+			else
+	     
+			{
+	        
+				printf("%s",r_buf);
+		 
+				//read(fd,r_buf,1);
+		 
+				//printf("%s",r_buf);
+	     
+			}
+	 
+		}
+    
+	}
+     
+   
+	close(fd);
+
+    
+	return 0;
+
+}
